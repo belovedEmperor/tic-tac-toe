@@ -44,6 +44,24 @@ const gameBoard = () => {
   return { MARKS, grid, checkWin, markSpot };
 };
 
+function createPlayer(playerMark) {
+  let score = 0;
+
+  function checkScore() {
+    return score;
+  }
+
+  function incrementScore() {
+    score++;
+  }
+
+  function resetScore() {
+    score = 0;
+  }
+
+  return { mark: playerMark, checkScore, incrementScore, resetScore };
+}
+
 const board = gameBoard();
 board.markSpot(0, board.MARKS.o);
 console.log(board.checkWin(board.MARKS.o));
