@@ -1,0 +1,32 @@
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+
+  .grid-spot {
+    width: 9rem;
+    height: 9rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 6rem;
+    border: solid black 0.2rem;
+  }
+}
+
+p {
+  display: inline;
+}

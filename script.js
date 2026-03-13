@@ -10,7 +10,7 @@ const gameBoard = (() => {
     [2, 4, 6],
   ];
   const MARKS = {
-    empty: "empty",
+    empty: "",
     x: "x",
     o: "o",
   };
@@ -54,6 +54,35 @@ const gameBoard = (() => {
   return { MARKS, grid, checkWin, markSpot, clearBoard, checkHasEmptySpot };
 })();
 
+const display = (() => {
+  const grid = document.querySelector(".grid");
+  const gridSpots = grid.children;
+  const player1Score = document.querySelector(".player1-score");
+  const player2Score = document.querySelector(".player2-score");
+  const currentPlayer = document.querySelector(".current-player");
+  const resetButton = document.querySelector(".reset-button");
+
+  function markSpot(index, mark) {
+    gridSpots[index].textContent = mark;
+  }
+
+  function clearGrid() {
+    for (const gridSpot of gridSpots) {
+      gridSpot.textContent = "";
+    }
+  }
+
+  return {
+    markSpot,
+    clearGrid,
+    grid,
+    player1Score,
+    player2Score,
+    currentPlayer,
+    resetButton,
+  };
+})();
+
 function createPlayer(mark) {
   let score = 0;
 
@@ -80,23 +109,49 @@ const game = (() => {
   };
   const player1 = createPlayer(gameBoard.MARKS.x);
   const player2 = createPlayer(gameBoard.MARKS.o);
+  let currentPlayer = player1;
+  let turn = true;
 
-  function playSpot(index, player) {
-    gameBoard.markSpot(index, player.mark);
-    return checkGameState(player);
+  function switchPlayer() {
+    turn = !turn;
+    if (turn === true) {
+      currentPlayer = player1;
+      display.currentPlayer.textContent = "Player 1";
+    } else {
+      currentPlayer = player2;
+      display.currentPlayer.textContent = "Player 2";
+    }
+  }
+
+  function playTurn(index) {
+    const success = gameBoard.markSpot(index, currentPlayer.mark);
+    if (success) {
+      display.markSpot(index, currentPlayer.mark);
+      if (checkGameState(currentPlayer) === GAME_STATES.ongoing) switchPlayer();
+    }
   }
 
   function incrementPlayerScore(player) {
     player.incrementScore();
+    player === player1
+      ? (display.player1Score.textContent = player.getScore())
+      : (display.player2Score.textContent = player.getScore());
   }
 
-  function endGame(gameState, player, force) {
-    if (force === true) {
+  function endGame({
+    gameState = GAME_STATES.tie,
+    player = player1,
+    force = false,
+  }) {
+    if (
+      force === true ||
+      gameState === GAME_STATES.win ||
+      gameState === GAME_STATES.tie
+    ) {
+      if (gameState === GAME_STATES.win) incrementPlayerScore(player);
+      display.clearGrid();
       gameBoard.clearBoard();
-      return true;
-    } else if (gameState === GAME_STATES.win || gameState === GAME_STATES.tie) {
-      gameBoard.clearBoard();
-      player.incrementScore();
+      display.currentPlayer.textContent = "Player 1";
       return true;
     }
     return false;
@@ -104,10 +159,10 @@ const game = (() => {
 
   function checkGameState(player) {
     if (gameBoard.checkWin(player.mark) === true) {
-      endGame(GAME_STATES.win, player);
+      endGame({ gameState: GAME_STATES.win, player: player });
       return GAME_STATES.win;
     } else if (gameBoard.checkHasEmptySpot() === false) {
-      endGame(GAME_STATES.tie, player);
+      endGame({ gameState: GAME_STATES.tie, player: player });
       return GAME_STATES.tie;
     } else return GAME_STATES.ongoing;
   }
@@ -115,41 +170,26 @@ const game = (() => {
   function resetGame() {
     player1.resetScore();
     player2.resetScore();
-    endGame(null, null, true);
+    display.player1Score.textContent = "0";
+    display.player2Score.textContent = "0";
+    endGame({ force: true });
+    return true;
   }
+
+  display.grid.addEventListener("click", (event) => {
+    const index = event.target.dataset.index;
+    if (index !== undefined) playTurn(index);
+  });
+  display.resetButton.addEventListener("click", (event) => {
+    resetGame();
+  });
 
   return {
     player1,
     player2,
-    playSpot,
+    playSpot: playTurn,
     incrementPlayerScore,
     checkGameState,
     resetGame,
   };
 })();
-
-console.log(gameBoard.grid);
-console.log(game.playSpot(0, game.player1));
-console.log(game.playSpot(1, game.player1));
-console.log(gameBoard.grid);
-console.log(game.playSpot(2, game.player1));
-console.log(gameBoard.grid);
-
-console.log(game.playSpot(0, game.player1));
-console.log(game.playSpot(1, game.player2));
-console.log(game.playSpot(2, game.player1));
-console.log(game.playSpot(3, game.player1));
-console.log(game.playSpot(4, game.player1));
-console.log(gameBoard.grid);
-console.log(game.player1.getScore());
-console.log(game.player2.getScore());
-game.resetGame();
-console.log(game.player1.getScore());
-console.log(game.player2.getScore());
-console.log(gameBoard.grid);
-console.log(game.playSpot(5, game.player2));
-console.log(game.playSpot(6, game.player2));
-console.log(game.playSpot(7, game.player1));
-console.log(gameBoard.grid);
-console.log(game.playSpot(8, game.player2));
-console.log(gameBoard.grid);
