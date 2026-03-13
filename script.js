@@ -27,25 +27,24 @@ const gameBoard = (() => {
     MARKS.empty,
   ]; // Every 3 elements is a row
 
-  function checkWin(playerMark) {
+  function checkWin(mark) {
     return WINNING_STATES.some((state) => {
       return state.every((index) => {
-        return grid[index] === playerMark;
+        return grid[index] === mark;
       });
     });
   }
 
-  function markSpot(index, playerMark) {
+  function markSpot(index, mark) {
     if (grid[index] !== MARKS.empty) return false;
-    grid[index] = playerMark;
+    grid[index] = mark;
     return true;
   }
 
   return { MARKS, grid, checkWin, markSpot };
-};
 })();
 
-function createPlayer(playerMark) {
+function createPlayer(mark) {
   let score = 0;
 
   function checkScore() {
@@ -60,13 +59,12 @@ function createPlayer(playerMark) {
     score = 0;
   }
 
-  return { mark: playerMark, checkScore, incrementScore, resetScore };
+  return { mark, checkScore, incrementScore, resetScore };
 }
 
-const board = gameBoard();
-board.markSpot(0, board.MARKS.o);
-console.log(board.checkWin(board.MARKS.o));
-board.markSpot(4, board.MARKS.o);
-board.markSpot(8, board.MARKS.o);
-console.log(board.checkWin(board.MARKS.o));
-console.log(board.grid);
+gameBoard.markSpot(0, gameBoard.MARKS.o);
+console.log(gameBoard.checkWin(gameBoard.MARKS.o));
+gameBoard.markSpot(4, gameBoard.MARKS.o);
+gameBoard.markSpot(8, gameBoard.MARKS.o);
+console.log(gameBoard.checkWin(gameBoard.MARKS.o));
+console.log(gameBoard.grid);
