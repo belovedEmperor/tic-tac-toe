@@ -1,4 +1,4 @@
-const gameBoard = () => {
+const gameBoard = (() => {
   const WINNING_STATES = [
     [0, 1, 2],
     [3, 4, 5],
@@ -43,6 +43,7 @@ const gameBoard = () => {
 
   return { MARKS, grid, checkWin, markSpot };
 };
+})();
 
 function createPlayer(playerMark) {
   let score = 0;
