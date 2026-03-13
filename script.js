@@ -41,7 +41,11 @@ const gameBoard = (() => {
     return true;
   }
 
-  return { MARKS, grid, checkWin, markSpot };
+  function clearBoard() {
+    grid.fill(MARKS.empty);
+  }
+
+  return { MARKS, grid, checkWin, markSpot, clearBoard };
 })();
 
 function createPlayer(mark) {
@@ -62,9 +66,21 @@ function createPlayer(mark) {
   return { mark, checkScore, incrementScore, resetScore };
 }
 
+const game = (() => {
+  const player1 = createPlayer(gameBoard.MARKS.x);
+  const player2 = createPlayer(gameBoard.MARKS.o);
+
+  function playSpot(index, player) {
+    gameBoard.markSpot(index, player.mark);
+    gameBoard.checkWin(player.mark);
+  }
+})();
+
 gameBoard.markSpot(0, gameBoard.MARKS.o);
 console.log(gameBoard.checkWin(gameBoard.MARKS.o));
 gameBoard.markSpot(4, gameBoard.MARKS.o);
 gameBoard.markSpot(8, gameBoard.MARKS.o);
 console.log(gameBoard.checkWin(gameBoard.MARKS.o));
+console.log(gameBoard.grid);
+gameBoard.clearBoard();
 console.log(gameBoard.grid);
